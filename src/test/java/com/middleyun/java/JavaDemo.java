@@ -1,4 +1,4 @@
-package com.middleyun;
+package com.middleyun.java;
 
 import lombok.Data;
 import org.junit.Test;

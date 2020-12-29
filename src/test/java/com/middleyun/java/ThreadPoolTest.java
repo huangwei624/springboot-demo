@@ -1,4 +1,4 @@
-package com.middleyun;
+package com.middleyun.java;
 
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;

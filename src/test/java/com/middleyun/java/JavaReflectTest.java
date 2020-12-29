@@ -1,4 +1,4 @@
-package com.middleyun;
+package com.middleyun.java;
 
 import com.middleyun.common.card.CardController;
 import com.middleyun.common.card.ScreenBlock;

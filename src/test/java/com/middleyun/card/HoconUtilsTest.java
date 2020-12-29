@@ -1,4 +1,4 @@
-package com.middleyun;
+package com.middleyun.card;
 
 import com.middleyun.common.card.ScreenBlock;
 import com.middleyun.util.HoconUtils;

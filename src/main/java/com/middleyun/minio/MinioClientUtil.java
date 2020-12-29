@@ -8,7 +8,7 @@ public class MinioClientUtil {
 
     static {
         minioClient = MinioClient.builder().endpoint("http://oss.lovestudy.world")
-                .credentials("123huangwei", "123huangwei").build();
+                .credentials("**", "**").build();
     }
 
     public static MinioClient getInstance() {
