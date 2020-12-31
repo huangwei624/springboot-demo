@@ -1,4 +1,4 @@
-package com.middleyun.swigger;
+package com.middleyun.swigger.domin.entity;
 
 import lombok.Data;
 

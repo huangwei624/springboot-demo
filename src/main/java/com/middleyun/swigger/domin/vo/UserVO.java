@@ -1,4 +1,4 @@
-package com.middleyun.swigger;
+package com.middleyun.swigger.domin.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -7,16 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class UserDTO {
-
+public class UserVO {
     @ApiModelProperty("用户昵称")
     private String nickName;
 
     private String phone;
-
-    @ApiModelProperty("登录密码")
-    private String password;
 }
