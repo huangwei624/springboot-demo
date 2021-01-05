@@ -70,5 +70,17 @@ https://docs.min.io/cn/
 
 ## swigger2 接口开发管理工具
 
+## mybatis-plus 
+参考文档：
+- https://mybatis.org/mybatis-3/zh/index.html
+- https://baomidou.com/
+
+
+## rabbitmq
+参考文档:
+- https://zhuanlan.zhihu.com/p/152325703
+- https://blog.csdn.net/wxb880114/article/details/105836274
+- https://zhuanlan.zhihu.com/p/145908317
+
 
 

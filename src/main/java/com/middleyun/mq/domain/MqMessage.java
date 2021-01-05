@@ -1,6 +1,5 @@
 package com.middleyun.mq.domain;
 
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,10 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
- * @title
+ * @title mq 消息封装
  * @description
  * @author huangwei
  * @createDate 2021/1/4
@@ -21,7 +19,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MqMessage implements Serializable {
+public class MqMessage  implements Serializable {
     private String id;
     private LocalDateTime createTime;
     private Object data;

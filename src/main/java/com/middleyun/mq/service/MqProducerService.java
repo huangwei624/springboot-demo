@@ -1,12 +1,11 @@
 package com.middleyun.mq.service;
 
+import com.middleyun.mq.domain.CustomCorrelationDate;
 import com.middleyun.mq.domain.MqMessage;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * @title
@@ -25,7 +24,8 @@ public class MqProducerService {
      * 发送短信消息
      */
     public void sendSmsMessage(MqMessage mqMessage, String exchangeName, String routingKey) {
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, mqMessage);
+        CorrelationData correlationData = new CustomCorrelationDate(mqMessage);
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, mqMessage, correlationData);
     }
 
     /**
