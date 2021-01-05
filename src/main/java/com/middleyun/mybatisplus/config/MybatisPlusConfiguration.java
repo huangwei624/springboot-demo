@@ -22,11 +22,9 @@ public class MybatisPlusConfiguration {
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
-
-        // 乐观锁支持
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        // 乐观锁支持， version 字段支持
         mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
-
         // mybatis 分页器
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return mybatisPlusInterceptor;
