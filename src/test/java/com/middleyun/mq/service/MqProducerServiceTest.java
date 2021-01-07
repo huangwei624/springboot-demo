@@ -1,10 +1,10 @@
 package com.middleyun.mq.service;
 
+import com.middleyun.common.util.DateTimeUtils;
+import com.middleyun.common.util.redis.RedisOpsUtils;
 import com.middleyun.mq.constant.MqConstant;
-import com.middleyun.mq.domain.MqMessage;
+import com.middleyun.mq.domain.MessageBody;
 import org.junit.jupiter.api.Test;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,14 +20,15 @@ class MqProducerServiceTest {
     @Test
     void sendSmsMessage() {
         String messageId = UUID.randomUUID().toString();
-        MqMessage mqMessage = MqMessage.builder().id(messageId)
-                .createTime(LocalDateTime.now())
+        MessageBody messageBody = MessageBody.builder().id(messageId)
+                .createTime(DateTimeUtils.formatDateTime(LocalDateTime.now()))
                 .data("sms:this is a simply message").build();
 
-        mqProducerService.sendSmsMessage(mqMessage, MqConstant.DIRECT_SMS_EXCHANGE, "sms");
+        mqProducerService.sendSmsMessage(messageBody, MqConstant.DIRECT_SMS_EXCHANGE, "sms");
     }
 
     @Test
     void sendEmailMessage() {
+        RedisOpsUtils redisOpsUtils = new RedisOpsUtils();
     }
 }

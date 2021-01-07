@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * @title mq 消息封装
@@ -19,8 +18,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MqMessage  implements Serializable {
+public class MessageBody implements Serializable {
     private String id;
-    private LocalDateTime createTime;
+    private String createTime;
     private Object data;
 }

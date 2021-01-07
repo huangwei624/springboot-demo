@@ -3,14 +3,21 @@ package com.middleyun.controller;
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
 import com.arronlong.httpclientutil.exception.HttpProcessException;
+import com.middleyun.common.util.DateTimeUtils;
+import com.middleyun.mq.constant.MqConstant;
+import com.middleyun.mq.domain.MessageBody;
+import com.middleyun.mq.service.MqProducerService;
 import io.swagger.annotations.Api;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Api(tags = "测试接口")
 @RestController
@@ -56,6 +63,20 @@ public class TestController {
                 "\tthis is a test title!\n" +
                 "<body>\n" +
                 "</html>";
+    }
+
+    @Autowired
+    private MqProducerService mqProducerService;
+
+    @GetMapping("/redis_lock")
+    public String redisLock() {
+        String messageId = UUID.randomUUID().toString();
+        MessageBody messageBody = MessageBody.builder().id(messageId)
+                .createTime(DateTimeUtils.formatDateTime(LocalDateTime.now()))
+                .data("sms:this is a simply message").build();
+
+        mqProducerService.sendSmsMessage(messageBody, MqConstant.DIRECT_SMS_EXCHANGE, "sms");
+        return "success";
     }
 
 }

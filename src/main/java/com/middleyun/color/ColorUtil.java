@@ -1,5 +1,6 @@
 package com.middleyun.color;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -27,9 +28,33 @@ public class ColorUtil {
      */
     public static final float[] YELLOW_HSB_H_RANGE = {45.0f, 65.0f};
 
+    /**
+     * 通过rgb 色获取当前像素点是红绿黄中的哪种颜色, 1:红色   2，绿色   3，黄色  0:其他颜色
+     * @param rgb rgb值
+     * @return
+     */
+    public static int getColor(int[] rgb) {
+        return getColor(rgb[0], rgb[1], rgb[2]);
+    }
 
     /**
-     * 通过rgb 色获取当前点是红绿黄中的哪种颜色, 1:红色   2，绿色   3，黄色  0:其他颜色
+     * 通过图片上的一点，判断该点是偏向什么颜色
+     * @param imgPath   图片路径
+     * @param xPoint 该点的x坐标
+     * @param yPoint 该点的y坐标
+     * @return
+     * @throws IOException
+     */
+    public static int getColor(String imgPath, Integer xPoint, Integer yPoint) throws IOException {
+        int[] rgb = ImageUtil.getRgbFromImgPoint(imgPath, xPoint, yPoint);
+        if (rgb == null) {
+            throw new RuntimeException("get rgb error");
+        }
+        return getColor(rgb);
+    }
+
+    /**
+     * 通过rgb 色获取当前像素点是红绿黄中的哪种颜色, 1:红色   2，绿色   3，黄色  0:其他颜色
      * @return
      */
     public static int getColor(int r, int b, int g) {
@@ -45,7 +70,6 @@ public class ColorUtil {
         }
         return 0;
     }
-
 
     /**
      * rgb 转 hsb
@@ -155,7 +179,7 @@ public class ColorUtil {
      * @param hsb
      * @return
      */
-    private static boolean isGreen(float[] hsb) {
+     private static boolean isGreen(float[] hsb) {
         if (hsb[0] < 0 || hsb[1] < 0 || hsb[2] < 0) {
             return false;
         }

@@ -2,8 +2,13 @@ package com.middleyun.mq.config;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.middleyun.mq.domain.CustomCorrelationDate;
-import com.middleyun.mq.domain.MqMessage;
+import com.middleyun.common.util.redis.RedisOpsUtils;
+import com.middleyun.mq.constant.MqConstant;
+import com.middleyun.mq.domain.MessageBody;
+import com.middleyun.mq.domain.MessageEntity;
+import com.middleyun.mq.util.MessageUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -15,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 参考文档
@@ -34,44 +40,82 @@ public class RabbitMQConfiguration {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private ConfirmCallbackImpl confirmCallback;
+
+    @Autowired
+    private ReturnCallbackImpl returnCallback;
+
+
+
     @PostConstruct
     public void init() {
-        rabbitTemplate.setConfirmCallback(new ConfirmCallbackImpl());
-        rabbitTemplate.setReturnCallback(new ReturnCallbackImpl());
-        rabbitTemplate.setMessageConverter(new MyMessageConverter<>(MqMessage.class));
+        rabbitTemplate.setConfirmCallback(confirmCallback);
+        rabbitTemplate.setReturnCallback(returnCallback);
+        rabbitTemplate.setMessageConverter(new MyMessageConverter<>(MessageBody.class));
     }
 
     /**
      * 消息是否发送到交换机的回调处理逻辑
      */
+    @Configuration
     public static class ConfirmCallbackImpl implements RabbitTemplate.ConfirmCallback {
+
+        @Autowired
+        private RedissonClient redissonClient;
+
         @Override
         public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-            if (ack) {
-                System.out.println("消息成功发送到交换机");
-            } else {
-                System.out.println("消息未发送到交换机：" + cause);
+            /*
+             * 根据CorrelationData 获取消息id, 从数据库或者redis 中获取消息，
+             * 修改消息状态为投递成功（投递失败（client-exchange），通过ack 判断）
+             */
+            if (correlationData == null) {
+                return;
             }
-            if (correlationData instanceof CustomCorrelationDate) {
-                CustomCorrelationDate customCorrelationDate = (CustomCorrelationDate) correlationData;
-                System.out.println(customCorrelationDate.getMqMessage());
+            String messageId = correlationData.getId();
+            RLock lock = redissonClient.getLock("mqlock");
+            lock.lock(30, TimeUnit.SECONDS);
+            System.out.println("confirm:加锁成功");
+            try {
+                MessageEntity messageEntity = (MessageEntity) RedisOpsUtils.get(MessageUtils.getMessageRedisKey(messageId));
+                if (messageEntity == null ||
+                        messageEntity.getStatus().equals(MqConstant.MessageStatus.CONSUME_SUCCESS.getStatus()) ||
+                        messageEntity.getStatus().equals(MqConstant.MessageStatus.CONSUME_FAIL.getStatus())) {
+                    return;
+                }
+                if (ack) {
+                    messageEntity.setStatus(MqConstant.MessageStatus.SEND_SUCCESS.getStatus());
+                } else {
+                    messageEntity.setStatus(MqConstant.MessageStatus.SEND_FAIL.getStatus());
+                }
+                RedisOpsUtils.set(MessageUtils.getMessageRedisKey(messageId), messageEntity);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                System.out.println("confirm:释放锁");
+                lock.unlock();
             }
-            // todo
-            // 根据CorrelationData 获取消息id, 从数据库或者redis 中获取消息，修改消息状态为投递成功（投递失败（client-exchange），通过ack 判断）
         }
     }
 
     /**
      * 消息由交换机未能转发到队列回调逻辑处理
      */
+    @Configuration
     public static class ReturnCallbackImpl implements RabbitTemplate.ReturnCallback {
         @Override
         public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
             System.out.println("消息未能由交换机转发到队列");
-            MqMessage mqMessage = JSONObject.parseObject(message.getBody(), MqMessage.class);
-            System.out.println(mqMessage);
-            // todo
+            MessageBody messageBody = JSONObject.parseObject(message.getBody(), MessageBody.class);
+
             // 从数据库或者redis 中获取消息，修改消息状态为投递失败(exchange-queue)
+            String messageId = messageBody.getId();
+            MessageEntity messageEntity = (MessageEntity) RedisOpsUtils.get(MessageUtils.getMessageRedisKey(messageId));
+            if (messageEntity != null) {
+                messageEntity.setStatus(MqConstant.MessageStatus.FROM_EXCHANGE_TO_QUEUE_FAIL.getStatus());
+                RedisOpsUtils.set(MessageUtils.getMessageRedisKey(messageId), messageEntity);
+            }
         }
     }
 
