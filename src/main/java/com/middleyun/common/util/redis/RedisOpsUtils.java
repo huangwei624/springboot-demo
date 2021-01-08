@@ -1,12 +1,7 @@
 package com.middleyun.common.util.redis;
 
 import com.middleyun.common.util.ApplicationContextHolder;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +17,7 @@ public class RedisOpsUtils {
 
     @SuppressWarnings("unchecked")
     private static RedisTemplate<String, Object> redisTemplate
-            = (RedisTemplate<String, Object>) ApplicationContextHolder.getApplicationContext()
-            .getBean("redisTemplate");
+            = (RedisTemplate<String, Object>) ApplicationContextHolder.getApplicationContext().getBean("redisTemplate");
 
     /**
      * 设置有效时间

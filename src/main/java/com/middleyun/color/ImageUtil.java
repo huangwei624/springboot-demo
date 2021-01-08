@@ -36,6 +36,40 @@ public class ImageUtil {
     }
 
     /**
+     * 获取图片上多个点的rgb值
+     * @param imagePath
+     * @param point
+     * @return
+     * @throws IOException
+     */
+    public static int[][] getRgbFromImgPoint(String imagePath, int[][] point) throws IOException {
+        File imageFile = new File(imagePath);
+        if (!imageFile.exists()) {
+            return null;
+        }
+        // 存放多个rgb值
+        int[][] rgbs = new int[point.length][3];
+        BufferedImage readBuffer = ImageIO.read(imageFile);
+        if (readBuffer == null) {
+            throw new RuntimeException("file is not image");
+        }
+        int imgWidth = readBuffer.getWidth();
+        int imgHeight = readBuffer.getHeight();
+        for (int i = 0; i < point.length; i++) {
+            if (point[i][0] >= imgWidth || point[i][1] >= imgHeight) {
+                continue;
+            }
+            int[] rgb = new int[3];
+            int pixel = readBuffer.getRGB(point[i][0], point[i][1]);
+            rgb[0] = (pixel & 0xff0000) >> 16;
+            rgb[1] = (pixel & 0xff00) >> 8;
+            rgb[2] = (pixel & 0xff);
+            rgbs[i] = rgb;
+        }
+        return rgbs;
+    }
+
+    /**
      * 获取图片的像素
      * @param imagePath
      * @return {宽度， 高度}
