@@ -28,40 +28,7 @@ public class ColorUtil {
      */
     public static final float[] YELLOW_HSB_H_RANGE = {45.0f, 65.0f};
 
-    /**
-     * 通过传入图片上一个区域的几个点，判断出该区域可能性最大的那个颜色
-     * @param rgb
-     * @return
-     */
-    public static int getColor(int[][] rgb) {
-        // 颜色比率，记录这些点出现红、绿、黄的次数
-        int[] colorRate = {0, 0, 0};    // 以次代表黄、绿、黄
-        for (int i = 0; i < rgb.length; i++) {
-            float[] hsb = rgbToHsb(rgb[i][0], rgb[i][1], rgb[i][2]);
-            if (isRed(hsb)) {
-                colorRate[0] += 1;
-            }
-            if (isGreen(hsb)) {
-                colorRate[1] += 1;
-            }
-            if (isYellow(hsb)) {
-                colorRate[2] += 1;
-            }
-        }
-        // 其他色
-        if (colorRate[0] == colorRate[1] && colorRate[0] == colorRate[2]) {
-            return 0;
-        }
-        int max = colorRate[0];
-        int maxIndex = 0;
-        for (int i = 1; i < colorRate.length; i++) {
-            if (colorRate[i] > max) {
-                max = colorRate[i];
-                maxIndex = i;
-            }
-        }
-        return maxIndex + 1;
-    }
+
 
     /**
      * 通过rgb 色获取当前像素点是红绿黄中的哪种颜色, 1:红色   2，绿色   3，黄色  0:其他颜色
@@ -101,6 +68,41 @@ public class ColorUtil {
             throw new RuntimeException("get rgbs fail from image");
         }
         return getColor(rgbs);
+    }
+
+    /**
+     * 通过传入图片上一个区域的几个点，判断出该区域可能性最大的那个颜色
+     * @param rgb
+     * @return
+     */
+    public static int getColor(int[][] rgb) {
+        // 颜色比率，记录这些点出现红、绿、黄的次数
+        int[] colorRate = {0, 0, 0};    // 以次代表黄、绿、黄
+        for (int i = 0; i < rgb.length; i++) {
+            float[] hsb = rgbToHsb(rgb[i][0], rgb[i][1], rgb[i][2]);
+            if (isRed(hsb)) {
+                colorRate[0] += 1;
+            }
+            if (isGreen(hsb)) {
+                colorRate[1] += 1;
+            }
+            if (isYellow(hsb)) {
+                colorRate[2] += 1;
+            }
+        }
+        // 其他色
+        if (colorRate[0] == colorRate[1] && colorRate[0] == colorRate[2]) {
+            return 0;
+        }
+        int max = colorRate[0];
+        int maxIndex = 0;
+        for (int i = 1; i < colorRate.length; i++) {
+            if (colorRate[i] > max) {
+                max = colorRate[i];
+                maxIndex = i;
+            }
+        }
+        return maxIndex + 1;
     }
 
     /**
