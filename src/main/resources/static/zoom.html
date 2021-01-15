@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+    }
+  </style>
+</head>
+
+<body style="display: flex;">
+  <div style="position:relative">
+    <canvas id="canvas" width="1000" height="700" style="cursor: pointer;"></canvas>
+    <div class="points" style="left: 0; top: 0; width: 100%; height: 100%; position:absolute; pointer-events: none">
+
+    </div>
+  </div>
+  <div style="display: flex; flex-direction:column;">
+    <canvas id="zoom" width="300" height="300"></canvas>
+    <!-- 页面像素值 -->
+    <br>
+    网页像素：<input type="text" value="" id="value">
+    <!-- 真实图片的像素值 -->
+    <br>
+    真实像素：<input type="text" value="" id="realValue">
+    <br>
+    <div>
+      <label for="smoothbtn">
+        <input type="checkbox" name="smoothbtn" checked="false" id="smoothbtn">
+        Enable image smoothing
+      </label>
+    </div>
+    <br>
+    <div id="result">
+
+    </div>
+    <br>
+  </div>
+  <script type="text/javascript">
+    var img = new Image();
+    img.src = "https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2771978851,2906984932&fm=26&gp=0.jpg";
+    img.onload = function () {
+      draw(this);
+    };
+
+    var currPointX;
+    var currPointY;
+    var selectedPoint = []
+
+    // input 设置value
+    function setValue(value) {
+      var el = document.getElementById("value")
+      currPointX = parseInt(value.split(",")[0])
+      currPointY = parseInt(value.split(",")[1])
+      el.setAttribute("value", value)
+    }
+
+    // 设置真实值
+    function setRealValue(pageValueX, pageValueY) {
+      var el = document.getElementById("realValue")
+      // 1920, 1080
+      var widthRate = 1000/1920;
+      var heightRate = 700/1080;
+      var realWidth = parseInt(pageValueX/widthRate);
+      var realHeight = parseInt(pageValueY/heightRate);
+      el.setAttribute("value", realWidth+","+realHeight)
+    }
+
+    function draw(img) {
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 1000, 700);
+      img.style.display = 'none';
+      var zoomctx = document.getElementById('zoom').getContext('2d');
+      var smoothbtn = document.getElementById('smoothbtn');
+      // 在放大面板上开启平滑模式，不显示像素快
+      var toggleSmoothing = function (event) {
+        zoomctx.imageSmoothingEnabled = this.checked;
+        zoomctx.mozImageSmoothingEnabled = this.checked;
+        zoomctx.webkitImageSmoothingEnabled = this.checked;
+        zoomctx.msImageSmoothingEnabled = this.checked;
+      };
+      smoothbtn.addEventListener('change', toggleSmoothing);
+
+      // 放大
+      var zoom = function (event) {
+        showZoom()
+        var x = event.layerX;
+        var y = event.layerY;
+        setValue(x+","+y)
+        setRealValue(x, y)
+        zoomctx.drawImage(canvas, Math.abs(x - 5), Math.abs(y - 5), 10, 10, 0, 0, 300, 300);
+        zoomctx.lineWidth = 2
+        zoomctx.beginPath()
+        zoomctx.arc(150, 150, 10, 0, Math.PI * 2, false);
+        zoomctx.stroke();
+      };
+
+      // 隐藏zoom
+      var hiddenZoom = function(event) {
+        var zoom = document.getElementById("zoom")
+        zoom.setAttribute("style", "display: none")
+      }
+
+      // 显示zoom
+      var showZoom = function(event) {
+        var zoom = document.getElementById("zoom")
+        zoom.setAttribute("style", "display: inline")
+      }
+
+      // 图片点击事件
+      var imgClick = function() {
+        if(selectedPoint.length >= 5) {
+          alert("点的个数已经达到上限！")
+          return
+        }
+        selectedPoint.push({x: currPointX, y:currPointY})
+        
+        reDrawIcon()
+        showSelectedResult();
+        // drawCircleIcon(selectedPoint.length)
+      }
+
+      var drawCircleIcon = function(num) {
+        var canvas = document.getElementById('canvas').getContext("2d");
+        canvas.beginPath()
+        canvas.arc(currPointX, currPointY, 8, 0, Math.PI * 2, false);
+        canvas.stroke();
+        canvas.font = "7px";
+        canvas.beginPath()
+        canvas.fillText(num, currPointX-3, currPointY+3);
+      }
+
+      canvas.addEventListener('mousemove', zoom);
+      canvas.addEventListener("mouseout", hiddenZoom)
+      canvas.addEventListener("click", imgClick)
+    }
+
+    // 创建一个点图标
+    var createPointIcon = function(positionX, positionY, num) {
+      return "<span style='display:block; font-weight:bold; padding:0px 3px; border-radius: 50%; border:2px solid black; font-size:7px; position:absolute; left:"+(positionX-5)+"px; top:"+(positionY-10)+"px'>"+num+"</span>";
+    }
+
+    // 删除一个点图标
+    function del(index) {
+      selectedPoint.splice(index, 1)
+      showSelectedResult()
+      reDrawIcon()
+    }
+
+    // 重绘点图标
+    var reDrawIcon = function() {
+      var el = document.getElementsByClassName("points")[0]
+        var innerHtml = ""
+        selectedPoint.forEach((item, index) => {
+          innerHtml += createPointIcon(item.x, item.y, index+1)
+        })
+        el.innerHTML = innerHtml +'';
+    }
+
+
+    // 显示选中的结果
+    var showSelectedResult = function() {
+      var resultEl = document.getElementById("result")
+      var innerHtml = "<p>共选中了"+selectedPoint.length+"个点</p>";
+      selectedPoint.forEach((item, index) => {
+        innerHtml += "<p>第"+(index+1)+"个点的坐标：("+item.x+","+item.y+")<span style='color:red; cursor: pointer;' onclick='del("+index+")''>删除</span></p>"
+      })
+      resultEl.innerHTML = innerHtml
+    }
+
+  </script>
+</body>
+
+</html>

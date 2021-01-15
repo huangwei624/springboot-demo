@@ -1,4 +1,4 @@
-package com.middleyun;
+package com.middleyun.system;
 
 import java.lang.management.*;
 import java.lang.reflect.InvocationTargetException;
@@ -6,8 +6,14 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-public class Demo {
-
+/**
+ * @title
+ * @description
+ * @author huangwei
+ * @createDate 2021/1/15
+ * @version 1.0
+ */
+public class SystemDemo {
     static final long MB = 1024 * 1024;
 
     public static void main(String[] args) {
@@ -143,7 +149,7 @@ public class Demo {
         if(managers != null && !managers.isEmpty()){
             for(MemoryManagerMXBean manager : managers){
                 System.out.println("vm内存管理器：名称="+manager.getName()+",管理的内存区="
-                        +Arrays.deepToString(manager.getMemoryPoolNames())+",ObjectName="+manager.getObjectName());
+                        + Arrays.deepToString(manager.getMemoryPoolNames())+",ObjectName="+manager.getObjectName());
             }
         }
     }
@@ -231,6 +237,4 @@ public class Demo {
                 || "com.sun.management.UnixOperatingSystem".equals(className)
                 || "sun.management.OperatingSystemImpl".equals(className);
     }
-
-
 }
