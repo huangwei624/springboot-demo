@@ -18,7 +18,9 @@
     </div>
   </div>
   <div style="display: flex; flex-direction:column;">
-    <canvas id="zoom" width="300" height="300"></canvas>
+    <div>
+      <canvas id="zoom" width="300" height="300"></canvas>
+    </div>
     <!-- 页面像素值 -->
     <br>
     网页像素：<input type="text" value="" id="value">
@@ -40,14 +42,21 @@
   </div>
   <script type="text/javascript">
     var img = new Image();
-    img.src = "https://dss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2771978851,2906984932&fm=26&gp=0.jpg";
+    img.crossOrigin = 'anonymous';
+    img.src = "./end.jpg";
     img.onload = function () {
       draw(this);
     };
-
+    // 当前鼠标所在位置的x坐标
     var currPointX;
+    // 当前鼠标所在位置的y坐标
     var currPointY;
+
+    // 在图片上选中的点， 做多选中5个
     var selectedPoint = []
+
+    // 该图片的所有像素值, rgba 一维数组
+    var imageData = []
 
     // input 设置value
     function setValue(value) {
@@ -72,6 +81,7 @@
       var canvas = document.getElementById('canvas');
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, 1000, 700);
+      // imageData = ctx.getImageData(0, 0, 1000, 700)
       img.style.display = 'none';
       var zoomctx = document.getElementById('zoom').getContext('2d');
       var smoothbtn = document.getElementById('smoothbtn');
@@ -116,7 +126,9 @@
           alert("点的个数已经达到上限！")
           return
         }
-        selectedPoint.push({x: currPointX, y:currPointY})
+        // 获取该点的rgba 值
+        var rgba = ctx.getImageData(currPointX, currPointY, 1, 1).data
+        selectedPoint.push({x: currPointX, y:currPointY, rgba:rgba})
         
         reDrawIcon()
         showSelectedResult();
@@ -140,7 +152,7 @@
 
     // 创建一个点图标
     var createPointIcon = function(positionX, positionY, num) {
-      return "<span style='display:block; font-weight:bold; padding:0px 3px; border-radius: 50%; border:2px solid black; font-size:7px; position:absolute; left:"+(positionX-5)+"px; top:"+(positionY-10)+"px'>"+num+"</span>";
+      return "<span style='display:block; color:red; font-weight:bold; padding:0px 3px; border-radius: 50%;  border:2px solid red; font-size:7px; position:absolute; left:"+(positionX-5)+"px; top:"+(positionY-10)+"px'>"+num+"</span>";
     }
 
     // 删除一个点图标
@@ -166,7 +178,10 @@
       var resultEl = document.getElementById("result")
       var innerHtml = "<p>共选中了"+selectedPoint.length+"个点</p>";
       selectedPoint.forEach((item, index) => {
-        innerHtml += "<p>第"+(index+1)+"个点的坐标：("+item.x+","+item.y+")<span style='color:red; cursor: pointer;' onclick='del("+index+")''>删除</span></p>"
+        innerHtml += "<p>第"+(index+1)+"个点的坐标：("+item.x+","+item.y+"), rgba("+item.rgba[0]+", "+
+          item.rgba[1]+", "+item.rgba[2]+", "+item.rgba[3]/255+
+          ")<span style='display:inline-block; width:100px; height:20px; background-color: rgb("+item.rgba[0]+", "+
+          item.rgba[1]+", "+item.rgba[2]+")'></span><span style='color:red; cursor: pointer;' onclick='del("+index+")''>删除</span></p>"
       })
       resultEl.innerHTML = innerHtml
     }
