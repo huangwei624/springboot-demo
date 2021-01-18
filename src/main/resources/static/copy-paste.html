@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>copy-paste</title>
+</head>
+<body>
+
+    <input type="button" value="粘贴" onclick="paste(this)">
+    <input type="textarea" style="width: 100px; height: 100px;">
+    <br>
+    <input type="button" value="复制" onclick="copy(this)">
+    <!-- <textarea id="copy" style="width: 100px; height: 100px;"></textarea> -->
+    <input id="copy" style="width: 100px; height: 100px;"></input>
+
+    <p id="p">hello world</p>
+
+
+    <div id="div">
+        <p>hello world</p>
+        <p>hello world</p>
+    </div>
+    
+    <script type="text/javascript">
+        function paste(el) {
+            console.info(el)
+            el.select()
+        }
+
+
+        function copy() {
+            // var el = document.getElementById("copy")
+            var el = document.getElementById("p")
+            // var el = document.getElementById("div")
+            el.select()
+            var res = document.execCommand("copy")
+            if(res) {
+                alert("复制成功")
+            }
+        }
+    </script>
+
+</body>
+</html>
