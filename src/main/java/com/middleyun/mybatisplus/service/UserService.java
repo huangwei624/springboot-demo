@@ -25,4 +25,11 @@ public interface UserService extends BaseService<SysUser, SysUserDTO> {
 
     Boolean deleteAndCreate(Long id);
 
+    /**
+     * 批量添加用户信息
+     * @param users 用户信息
+     * @return 添加成功的数量
+     */
+    Long batchSaveUser(List<SysUser> users);
+
 }

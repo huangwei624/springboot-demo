@@ -16,29 +16,29 @@ import java.util.Date;
 public class BaseEntity {
 
     @TableId(type = IdType.AUTO)
-    private Long id;
+    protected Long id;
 
     /**
      * 乐观锁字段
      */
     @Version
-    private Long version;
+    protected Long version;
 
     /**
      * 逻辑删除字段
      */
     @TableLogic(value = "0", delval = "1")
-    private String deleteFlag;
+    protected String deleteFlag;
 
     /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
+    protected Date createTime;
 
     /**
      * 更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
+    protected Date updateTime;
 }

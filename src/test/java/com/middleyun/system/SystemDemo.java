@@ -124,7 +124,7 @@ public class SystemDemo {
         //返回虚拟机在毫秒内的开始时间。该方法返回了虚拟机启动时的近似时间
         System.out.println("jvm启动时间（毫秒）:"+runtime.getStartTime());
         //相当于System.getProperties
-        System.out.println("获取System.properties:"+runtime.getSystemProperties());
+        System.out.println("获取System.config:"+runtime.getSystemProperties());
         System.out.println("jvm正常运行时间（毫秒）:"+runtime.getUptime());
         //相当于System.getProperty("java.vm.name").
         System.out.println("jvm名称:"+runtime.getVmName());

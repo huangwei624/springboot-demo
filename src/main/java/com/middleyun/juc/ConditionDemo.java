@@ -22,7 +22,7 @@ public class ConditionDemo {
             try {
                 for (int i = 0; i < 20; i++) {
                     task.increment();
-                     TimeUnit.MILLISECONDS.sleep(0);
+                    TimeUnit.MILLISECONDS.sleep(0);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -66,6 +66,7 @@ class Task {
             this.taskNum ++;
             System.out.println(Thread.currentThread().getName() + "-->生产了一个任务，当前任务数量为：" + this.taskNum);
             consumer.signal();
+            System.out.println("唤醒消费者");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -83,6 +84,7 @@ class Task {
             this.taskNum --;
             System.out.println(Thread.currentThread().getName() + "-->消费了一个任务，当前任务数量为：" + this.taskNum);
             producer.signal();
+            System.out.println("唤醒生产者");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

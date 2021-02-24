@@ -114,6 +114,16 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * 批量添加用户信息
+     * @param users 用户信息
+     * @return 添加成功的数量
+     */
+    @Override
+    public Long batchSaveUser(List<SysUser> users) {
+        return userMapper.batchInsertUser(users);
+    }
+
+    /**
      * 模拟事务，删除并创建用户
      * @return
      */
@@ -131,6 +141,13 @@ public class UserServiceImpl implements UserService {
         userMapper.insert(user);
         return true;
     }
+
+    /**
+     * 批量保存用户信息
+     * @param users
+     * @return
+     */
+
 
     /**
      * 构建动态查询条件

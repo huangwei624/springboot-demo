@@ -100,7 +100,7 @@ public class ElasticSearchTest {
 
         // mapping 设置
         createIndexRequest.mapping(XContentFactory.jsonBuilder().startObject()
-                .startObject("properties")
+                .startObject("config")
                     .startObject("id").field("type", "integer").endObject()
                     .startObject("pageViews").field("type", "integer").endObject()
                     .startObject("startNums").field("type", "integer").endObject()
